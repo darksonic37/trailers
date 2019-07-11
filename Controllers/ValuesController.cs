@@ -16,20 +16,24 @@ namespace trailers.Controllers
         private string Title;
         private string Youtube;
         private string Release;
+        private float Rating;
+        private bool Adult;
 
-        public Movie(int id, string title, string youtube, string release)
+        public Movie(int id, string title, string youtube, string release, float rating, bool adult)
         {
             Id = id;
             Title = title;
             Youtube = youtube;
             Release = release;
+            Rating = rating;
+            Adult = adult;
         }
 
         public override string ToString()
         {
             string str = "";
             str = String.Concat(str, "{");
-            str = String.Concat(str, $"\"id\": {Id}, \"title\": \"{Title}\", \"youtube\": \"{Youtube}\", \"release\": \"{Release}\"");
+            str = String.Concat(str, $"\"id\": {Id}, \"title\": \"{Title}\", \"youtube\": \"{Youtube}\", \"release\": \"{Release}\", \"rating\": {Rating}, \"adult\": {Adult.ToString().ToLower()}");
             str = String.Concat(str, "}");
             return str;
         }
@@ -53,7 +57,6 @@ namespace trailers.Controllers
             // Request movies matching query
             var searchResponseString = await client.GetStringAsync($"{API_URL}/search/movie?api_key={API_KEY}&query={query}&append_to_response=videos");
             var searchResponseJson = JsonConvert.DeserializeObject<JObject>(searchResponseString);
-            Console.WriteLine(searchResponseJson);
             
             // Build list of movies
             var movies = new List<Movie>();
@@ -63,6 +66,8 @@ namespace trailers.Controllers
                 var id = result["id"].ToObject<int>();
                 var title = result["title"].ToObject<string>();
                 var release = result["release_date"].ToObject<string>();
+                var rating = result["vote_average"].ToObject<float>();
+                var adult = result["adult"].ToObject<bool>();
                 
                 // Request this specific movie's trailer URL
                 var trailerResponseString = await client.GetStringAsync($"{API_URL}/movie/{id}/videos?api_key={API_KEY}");
@@ -72,12 +77,7 @@ namespace trailers.Controllers
                     trailer = String.Concat("https://www.youtube.com/watch?v=", trailerResponseJson["results"][0]["key"].ToObject<string>());
 
                 // Build movie object and append to list of movies
-                var m = new Movie(
-                    id, 
-                    title,
-                    trailer, 
-                    release
-                );
+                var m = new Movie(id, title, trailer, release, rating, adult);
                 movies.Add(m);
             }
 
