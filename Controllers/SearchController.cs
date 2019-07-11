@@ -48,12 +48,12 @@ namespace trailers.Controllers
         private static readonly String API_URL = "https://api.themoviedb.org/3";
         private static readonly HttpClient client = new HttpClient();
 
-        // GET api/search/{query}
+        // GET /api/search/{query}
         [HttpGet("{query}")]
         public async Task<ActionResult<string>> GetSearch(string query)
         {
             // Request movies matching query
-            var searchResponseString = await client.GetStringAsync($"{API_URL}/search/movie?api_key={API_KEY}&query={query}&append_to_response=videos");
+            var searchResponseString = await client.GetStringAsync($"{API_URL}/search/movie?api_key={API_KEY}&query={query}");
             var searchResponseJson = JsonConvert.DeserializeObject<JObject>(searchResponseString);
             
             // Build list of movies

@@ -42,7 +42,11 @@ namespace trailers
             }
 
             app.UseHttpsRedirection();
-            app.UseMvc();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(name: "search", template: "{controller=Search}/{action=Search}/{query}");
+                routes.MapRoute(name: "autocomplete", template: "{controller=Autocomplete}/{action=Autocomplete}/{query}");
+            });
         }
     }
 }
