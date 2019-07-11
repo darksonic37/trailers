@@ -49,10 +49,10 @@ namespace trailers.Controllers
         private static readonly HttpClient client = new HttpClient();
 
         // GET api/search
-        [HttpGet]
-        public async Task<ActionResult<string>> Get()
+        [HttpGet("{query}")]
+        public async Task<ActionResult<string>> GetSearch(string query)
         {
-            var query = "007";
+            //var query = "007";
 
             // Request movies matching query
             var searchResponseString = await client.GetStringAsync($"{API_URL}/search/movie?api_key={API_KEY}&query={query}&append_to_response=videos");
@@ -70,11 +70,17 @@ namespace trailers.Controllers
                 var adult = result["adult"].ToObject<bool>();
                 
                 // Request this specific movie's trailer URL
-                var trailerResponseString = await client.GetStringAsync($"{API_URL}/movie/{id}/videos?api_key={API_KEY}");
-                var trailerResponseJson = JsonConvert.DeserializeObject<JObject>(trailerResponseString);
                 var trailer = "";
-                if(trailerResponseJson["results"].Count() != 0)
+                try
+                {
+                    var trailerResponseString = await client.GetStringAsync($"{API_URL}/movie/{id}/videos?api_key={API_KEY}");
+                    var trailerResponseJson = JsonConvert.DeserializeObject<JObject>(trailerResponseString);
                     trailer = String.Concat("https://www.youtube.com/watch?v=", trailerResponseJson["results"][0]["key"].ToObject<string>());
+                }
+                catch
+                {
+                    trailer = "";
+                }
 
                 // Build movie object and append to list of movies
                 var m = new Movie(id, title, trailer, release, rating, adult);
