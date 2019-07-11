@@ -42,13 +42,13 @@ namespace trailers.Controllers
 
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class SearchController : ControllerBase
     {
         private static readonly String API_KEY = "fcddb7069db544977f0b9737e9230666";
         private static readonly String API_URL = "https://api.themoviedb.org/3";
         private static readonly HttpClient client = new HttpClient();
 
-        // GET api/values
+        // GET api/search
         [HttpGet]
         public async Task<ActionResult<string>> Get()
         {
