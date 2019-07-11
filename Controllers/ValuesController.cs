@@ -29,7 +29,7 @@ namespace trailers.Controllers
         {
             string str = "";
             str = String.Concat(str, "{");
-            str = String.Concat(str, $"\"id\": {Id}, \"title\": \"{Title}\", \"Youtube\": \"{Youtube}\", \"Release\": \"{Release}\"");
+            str = String.Concat(str, $"\"id\": {Id}, \"title\": \"{Title}\", \"youtube\": \"{Youtube}\", \"release\": \"{Release}\"");
             str = String.Concat(str, "}");
             return str;
         }
@@ -41,6 +41,7 @@ namespace trailers.Controllers
     public class ValuesController : ControllerBase
     {
         private static readonly String API_KEY = "fcddb7069db544977f0b9737e9230666";
+        private static readonly String API_URL = "https://api.themoviedb.org/3";
         private static readonly HttpClient client = new HttpClient();
 
         // GET api/values
@@ -48,18 +49,39 @@ namespace trailers.Controllers
         public async Task<ActionResult<string>> Get()
         {
             var query = "007";
-            var responseString = await client.GetStringAsync($"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}&query={query}");
-            var responseJson = JsonConvert.DeserializeObject<JObject>(responseString);
 
+            // Request movies matching query
+            var searchResponseString = await client.GetStringAsync($"{API_URL}/search/movie?api_key={API_KEY}&query={query}&append_to_response=videos");
+            var searchResponseJson = JsonConvert.DeserializeObject<JObject>(searchResponseString);
+            Console.WriteLine(searchResponseJson);
+            
+            // Build list of movies
             var movies = new List<Movie>();
-            var results = responseJson["results"];
-            foreach(var result in results)
+            foreach(var result in searchResponseJson["results"])
             {
-                var m = new Movie(result["id"].ToObject<int>(), result["title"].ToObject<string>(), "", result["release_date"].ToObject<string>());
+                // Save this specific movie's basic details
+                var id = result["id"].ToObject<int>();
+                var title = result["title"].ToObject<string>();
+                var release = result["release_date"].ToObject<string>();
+                
+                // Request this specific movie's trailer URL
+                var trailerResponseString = await client.GetStringAsync($"{API_URL}/movie/{id}/videos?api_key={API_KEY}");
+                var trailerResponseJson = JsonConvert.DeserializeObject<JObject>(trailerResponseString);
+                var trailer = "";
+                if(trailerResponseJson["results"].Count() != 0)
+                    trailer = String.Concat("https://www.youtube.com/watch?v=", trailerResponseJson["results"][0]["key"].ToObject<string>());
+
+                // Build movie object and append to list of movies
+                var m = new Movie(
+                    id, 
+                    title,
+                    trailer, 
+                    release
+                );
                 movies.Add(m);
             }
 
-            // Build JSON array as a string
+            // Build JSON response as a string
             var str = "[";
             str = String.Concat(str, movies[0].ToString());
             for(int i = 1; i < movies.Count; i++) 
