@@ -25,6 +25,7 @@ namespace trailers
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -41,7 +42,8 @@ namespace trailers
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            app.UseCors(builder => builder.WithOrigins("http://localhost:1337"));
+            //app.UseHttpsRedirection();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(name: "search", template: "{controller=Search}/{action=Search}/{query}");

@@ -67,28 +67,26 @@ namespace trailers.Controllers
                 var rating = result["vote_average"].ToObject<float>();
                 var adult = result["adult"].ToObject<bool>();
                 
-                // Request this specific movie's trailer URL
-                var trailer = "";
                 try
                 {
+                    // Request this specific movie's trailer URL
                     var trailerResponseString = await client.GetStringAsync($"{API_URL}/movie/{id}/videos?api_key={API_KEY}");
                     var trailerResponseJson = JsonConvert.DeserializeObject<JObject>(trailerResponseString);
-                    trailer = String.Concat("https://www.youtube.com/watch?v=", trailerResponseJson["results"][0]["key"].ToObject<string>());
-                }
-                catch
-                {
-                    trailer = "";
-                }
+                    var trailer = String.Concat("https://www.youtube.com/embed/", trailerResponseJson["results"][0]["key"].ToObject<string>());
 
-                // Build movie object and append to list of movies
-                var m = new Movie(id, title, trailer, release, rating, adult);
-                movies.Add(m);
+                    // Build movie object and append to list of movies
+                    var m = new Movie(id, title, trailer, release, rating, adult);
+                    movies.Add(m);
+                } catch {
+
+                }
             }
 
             // Build JSON response as a string
+            var limit = movies.Count > 5 ? 5 : movies.Count;
             var str = "[";
             str = String.Concat(str, movies[0].ToString());
-            for(int i = 1; i < movies.Count; i++) 
+            for(int i = 1; i < limit; i++) 
             {
                 str = String.Concat(str, ",");
                 str = String.Concat(str, movies[i].ToString());

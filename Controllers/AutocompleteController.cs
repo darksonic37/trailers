@@ -33,9 +33,9 @@ namespace trailers.Controllers
                 // Save this specific movie's basic details
                 var title = result["title"].ToObject<string>();
                 titles.Add(title);
-                Console.WriteLine(title);
             }
 
+            // Build JSON string manually
             string response = "[\"";
             response = String.Concat(response, string.Join("\",\"", titles));
             response = String.Concat(response, "\"]");
