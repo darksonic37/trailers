@@ -18,9 +18,11 @@ function render(movies) {
   }
 
   for (const movie of movies) {
-    const li = document.createElement('li');
-    li.appendChild(document.createTextNode(movie.title))
-    ul.appendChild(li)
+    if (movie.youtube) {
+      const li = document.createElement('li');
+      li.innerHTML = `<iframe id="ytplayer-${movie.id}" type="text/html" width="640" height="360" src="${movie.youtube}" frameborder="0"></iframe>`
+      ul.appendChild(li)
+    }
   }
 }
 
