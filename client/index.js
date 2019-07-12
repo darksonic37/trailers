@@ -20,7 +20,7 @@ function render(movies) {
   for (const movie of movies) {
     if (movie.youtube) {
       const li = document.createElement('li');
-      li.innerHTML = `<iframe id="ytplayer-${movie.id}" type="text/html" width="640" height="360" src="${movie.youtube}" frameborder="0"></iframe>`
+      li.innerHTML = `<div><h2>${movie.title}</h2><iframe id="ytplayer-${movie.id}" type="text/html" width="640" height="360" src="${movie.youtube}" frameborder="0"></iframe><p>Release: ${movie.release}</p><p>Rating: ${movie.rating}/10</p>`
       ul.appendChild(li)
     }
   }
