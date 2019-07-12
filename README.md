@@ -16,3 +16,5 @@ Run any HTTP server to serve the `client/` directory on `http://localhost:1337`:
 cd client/
 python -m http.server 1337
 ```
+
+Run Varnish on `http://localhost:80` with the backend pointing to `http://localhost:5000`.
