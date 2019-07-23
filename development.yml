@@ -1,0 +1,58 @@
+version: '3.4'
+
+services:
+  server:
+    image: trailers-server
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+      restart_policy:
+        delay: 5s
+        condition: any
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    volumes:
+      - ./server:/app
+    networks:
+      - network
+
+  cache:
+    image: trailers-cache
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+      restart_policy:
+        delay: 5s
+        condition: any
+    ports:
+      - "9999:80"
+    networks:
+      - network
+
+  client:
+    image: trailers-client
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+        order: stop-first
+      restart_policy:
+        delay: 5s
+        condition: any
+    ports:
+      - "1337:80"
+    networks:
+      - network
+
+networks:
+  network:
+    driver: overlay
+    attachable: true
